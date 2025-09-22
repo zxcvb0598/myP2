@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}按课程统计 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">按课程统计</h1>
+        <a href="{{ url_for('statistics_dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回统计首页
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>课程名称</th>
+                            <th>课程代码</th>
+                            <th>学分</th>
+                            <th>选课人数</th>
+                            <th>平均分</th>
+                            <th>最高分</th>
+                            <th>最低分</th>
+                            <th>不及格率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if course_stats %}
+                            {% for stat in course_stats %}
+                            <tr>
+                                <td>{{ stat.course_name }}</td>
+                                <td>{{ stat.course_code }}</td>
+                                <td>{{ stat.credits }}</td>
+                                <td>{{ stat.student_count }}</td>
+                                <td>{{ stat.average_score|round(2) }}</td>
+                                <td>{{ stat.max_score }}</td>
+                                <td>{{ stat.min_score }}</td>
+                                <td>{{ stat.fail_rate|round(2) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">暂无课程统计数据</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

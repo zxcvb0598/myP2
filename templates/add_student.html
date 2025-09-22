@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}添加学生 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">添加学生</h1>
+        <a href="{{ url_for('student_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回学生列表
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="student_id" class="form-label">学号 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="student_id" name="student_id" placeholder="请输入学号" required>
+                    <div class="form-text">学号将作为学生的唯一标识，不可重复</div>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">姓名 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="请输入姓名" required>
+                </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">性别</label>
+                    <select class="form-select" id="gender" name="gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="date_of_birth" class="form-label">出生日期</label>
+                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth">
+                </div>
+                <div class="mb-3">
+                    <label for="class_name" class="form-label">班级</label>
+                    <input type="text" class="form-control" id="class_name" name="class_name" placeholder="请输入班级">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}添加课程 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">添加课程</h1>
+        <a href="{{ url_for('course_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回课程列表
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="course_code" class="form-label">课程代码 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="course_code" name="course_code" placeholder="请输入课程代码" required>
+                    <div class="form-text">课程代码将作为课程的唯一标识，不可重复</div>
+                </div>
+                <div class="mb-3">
+                    <label for="course_name" class="form-label">课程名称 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="course_name" name="course_name" placeholder="请输入课程名称" required>
+                </div>
+                <div class="mb-3">
+                    <label for="credits" class="form-label">学分 <span class="text-danger">*</span></label>
+                    <input type="number" step="0.5" min="0.5" max="10" class="form-control" id="credits" name="credits" placeholder="请输入学分" required>
+                </div>
+                <div class="mb-3">
+                    <label for="semester" class="form-label">学期</label>
+                    <input type="text" class="form-control" id="semester" name="semester" placeholder="例如：2023-2024学年第一学期">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}统计分析 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">统计分析</h1>
+    </div>
+
+    <!-- 总体统计卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">学生总数</h5>
+                    <p class="card-text display-4">{{ student_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">课程总数</h5>
+                    <p class="card-text display-4">{{ course_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">成绩记录</h5>
+                    <p class="card-text display-4">{{ score_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">平均成绩</h5>
+                    <p class="card-text display-4">{{ average_score|round(2) if average_score else 0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统计图表 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">成绩分布</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="scoreDistributionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">各课程平均分</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="courseAverageChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详细统计入口 -->
+    <div class="mb-4">
+        <h2 class="h4 mb-2">详细统计</h2>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <a href="{{ url_for('statistics_by_course') }}" class="card h-100 bg-light hover-shadow">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <div class="text-center">
+                            <i class="fas fa-book text-primary fa-3x mb-3"></i>
+                            <h5 class="card-title">按课程统计</h5>
+                            <p class="card-text">查看每门课程的详细成绩统计和分析</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="{{ url_for('statistics_by_student') }}" class="card h-100 bg-light hover-shadow">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <div class="text-center">
+                            <i class="fas fa-user-graduate text-secondary fa-3x mb-3"></i>
+                            <h5 class="card-title">按学生统计</h5>
+                            <p class="card-text">查看每个学生的详细成绩统计和分析</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="{{ url_for('detailed_statistics') }}" class="card h-100 bg-light hover-shadow">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line text-success fa-3x mb-3"></i>
+                            <h5 class="card-title">详细统计分析</h5>
+                            <p class="card-text">查看全面的统计数据和深入分析</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 成绩分布图表
+            const scoreCtx = document.getElementById('scoreDistributionChart').getContext('2d');
+            const scoreDistributionChart = new Chart(scoreCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-59', '60-69', '70-79', '80-89', '90-100'],
+                    datasets: [{
+                        label: '学生人数',
+                        data: [{{ score_distribution['0-59'] }}, {{ score_distribution['60-69'] }}, {{ score_distribution['70-79'] }}, {{ score_distribution['80-89'] }}, {{ score_distribution['90-100'] }}],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 课程平均分图表
+            const courseCtx = document.getElementById('courseAverageChart').getContext('2d');
+            const courseAverageChart = new Chart(courseCtx, {
+                type: 'bar',
+                data: {
+                    labels: [{% for course in top_courses %}"{{ course.course_name }}",{% endfor %}],
+                    datasets: [{
+                        label: '平均分',
+                        data: [{% for course in top_courses %}{{ course.average_score|round(2) }},{% endfor %}],
+                        backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

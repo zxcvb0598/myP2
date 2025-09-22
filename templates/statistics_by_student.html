@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}按学生统计 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">按学生统计</h1>
+        <a href="{{ url_for('statistics_dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回统计首页
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>学生姓名</th>
+                            <th>学号</th>
+                            <th>班级</th>
+                            <th>修读课程</th>
+                            <th>平均分</th>
+                            <th>总分</th>
+                            <th>最高分</th>
+                            <th>最低分</th>
+                            <th>不及格课程</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if student_stats %}
+                            {% for stat in student_stats %}
+                            <tr>
+                                <td>{{ stat.name }}</td>
+                                <td>{{ stat.student_id }}</td>
+                                <td>{{ stat.class_name }}</td>
+                                <td>{{ stat.course_count }}</td>
+                                <td>{{ stat.average_score|round(2) }}</td>
+                                <td>{{ stat.total_score|round(2) }}</td>
+                                <td>{{ stat.max_score }}</td>
+                                <td>{{ stat.min_score }}</td>
+                                <td>{{ stat.fail_courses }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">暂无学生统计数据</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

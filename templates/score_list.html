@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}成绩列表 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">成绩列表</h1>
+        <a href="{{ url_for('add_score') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 添加成绩
+        </a>
+    </div>
+
+    <!-- 筛选功能 -->
+    <div class="mb-4 card p-4">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="student_id" class="form-label">学生</label>
+                <select class="form-select" id="student_id" name="student_id">
+                    <option value="">所有学生</option>
+                    {% for student in students %}
+                        <option value="{{ student.id }}" {% if request.args.get('student_id') == student.id|string %}selected{% endif %}>
+                            {{ student.name }} ({{ student.student_id }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="course_id" class="form-label">课程</label>
+                <select class="form-select" id="course_id" name="course_id">
+                    <option value="">所有课程</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}" {% if request.args.get('course_id') == course.id|string %}selected{% endif %}>
+                            {{ course.course_name }} ({{ course.course_code }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="semester" class="form-label">学期</label>
+                <input type="text" class="form-control" id="semester" name="semester" placeholder="输入学期" value="{{ request.args.get('semester') }}">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> 筛选
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>学生姓名</th>
+                            <th>学号</th>
+                            <th>课程名称</th>
+                            <th>课程代码</th>
+                            <th>分数</th>
+                            <th>考试日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if scores %}
+                            {% for score in scores %}
+                            <tr class="{% if score.score < 60 %}table-danger{% endif %}">
+                                <td>{{ score.student.name }}</td>
+                                <td>{{ score.student.student_id }}</td>
+                                <td>{{ score.course.course_name }}</td>
+                                <td>{{ score.course.course_code }}</td>
+                                <td>{{ score.score }}</td>
+                                <td>{{ score.exam_date.strftime('%Y-%m-%d') if score.exam_date else '未设置' }}</td>
+                                <td>
+                                    <a href="{{ url_for('edit_score', score_id=score.id) }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> 编辑
+                                    </a>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-score-id="{{ score.id }}">
+                                        <i class="fas fa-trash-alt"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    {% if request.args %}没有找到匹配的成绩记录{% else %}暂无成绩数据，请添加成绩{% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 删除确认对话框
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const scoreId = this.getAttribute('data-score-id');
+                if (confirm('确定要删除该成绩记录吗？此操作不可恢复！')) {
+                    window.location.href = '{{ url_for('delete_score', score_id=0) }}'.replace('0', scoreId);
+                }
+            });
+        });
+    </script>
+{% endblock %}

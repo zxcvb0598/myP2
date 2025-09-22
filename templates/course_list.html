@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}课程列表 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">课程列表</h1>
+        <a href="{{ url_for('add_course') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 添加课程
+        </a>
+    </div>
+
+    <!-- 搜索功能 -->
+    <div class="mb-4">
+        <form method="GET" class="form-inline">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search" placeholder="搜索课程名称或代码" value="{{ search_term }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> 搜索
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>课程代码</th>
+                            <th>课程名称</th>
+                            <th>学分</th>
+                            <th>学期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if courses %}
+                            {% for course in courses %}
+                            <tr>
+                                <td>{{ course.course_code }}</td>
+                                <td>{{ course.course_name }}</td>
+                                <td>{{ course.credits }}</td>
+                                <td>{{ course.semester }}</td>
+                                <td>
+                                    <a href="{{ url_for('course_detail', course_id=course.id) }}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> 查看
+                                    </a>
+                                    <a href="{{ url_for('edit_course', course_id=course.id) }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> 编辑
+                                    </a>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-course-id="{{ course.id }}">
+                                        <i class="fas fa-trash-alt"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    {% if search_term %}
+                                        没有找到匹配的课程
+                                    {% else %}
+                                        暂无课程数据，请添加课程
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 删除确认对话框
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                if (confirm('确定要删除该课程吗？此操作将同时删除所有学生在该课程的成绩记录，且不可恢复！')) {
+                    window.location.href = '{{ url_for('delete_course', course_id=0) }}'.replace('0', courseId);
+                }
+            });
+        });
+    </script>
+{% endblock %}

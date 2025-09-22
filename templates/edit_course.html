@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑课程 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">编辑课程</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('course_detail', course_id=course.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 返回详情
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="course_code" class="form-label">课程代码 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="course_code" name="course_code" value="{{ course.course_code }}" required>
+                    <div class="form-text">课程代码将作为课程的唯一标识，不可重复</div>
+                </div>
+                <div class="mb-3">
+                    <label for="course_name" class="form-label">课程名称 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="course_name" name="course_name" value="{{ course.course_name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="credits" class="form-label">学分 <span class="text-danger">*</span></label>
+                    <input type="number" step="0.5" min="0.5" max="10" class="form-control" id="credits" name="credits" value="{{ course.credits }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="semester" class="form-label">学期</label>
+                    <input type="text" class="form-control" id="semester" name="semester" value="{{ course.semester }}">
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 保存修改
+                    </button>
+                    <button type="button" class="btn btn-danger ms-2" id="delete-btn">
+                        <i class="fas fa-trash-alt"></i> 删除课程
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('delete-btn').addEventListener('click', function() {
+            if (confirm('确定要删除该课程吗？此操作将同时删除所有学生在该课程的成绩记录，且不可恢复！')) {
+                window.location.href = '{{ url_for('delete_course', course_id=course.id) }}';
+            }
+        });
+    </script>
+{% endblock %}

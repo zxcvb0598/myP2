@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}详细统计分析 - 学生成绩管理系统{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <h1 class="display-5">详细统计分析</h1>
+        <a href="{{ url_for('statistics_dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回统计首页
+        </a>
+    </div>
+
+    <!-- 详细统计信息 -->
+    <div class="row mb-4">
+        <!-- 左侧信息 -->
+        <div class="col-md-6 mb-4">
+            <!-- 学生成绩分布详情 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">学生成绩分布详情</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>分数段</th>
+                                <th>学生人数</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for range, count in score_distribution.items() %}
+                                <tr>
+                                    <td>{{ range }}</td>
+                                    <td>{{ count }}</td>
+                                    <td>{{ (count / total_scores * 100)|round(2) }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <canvas id="scoreDistributionChart" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- 各班级平均成绩 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">各班级平均成绩</h5>
+                </div>
+                <div class="card-body">
+                    {% if class_averages %}
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>班级</th>
+                                    <th>学生人数</th>
+                                    <th>平均成绩</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for class_name, avg in class_averages.items() %}
+                                    <tr>
+                                        <td>{{ class_name }}</td>
+                                        <td>{{ class_students[class_name] }}</td>
+                                        <td>{{ avg|round(2) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-center text-muted">暂无班级统计数据</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧信息 -->
+        <div class="col-md-6 mb-4">
+            <!-- 各学期课程数量 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">各学期课程数量</h5>
+                </div>
+                <div class="card-body">
+                    {% if semester_courses %}
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>学期</th>
+                                    <th>课程数量</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for semester, count in semester_courses.items() %}
+                                    <tr>
+                                        <td>{{ semester }}</td>
+                                        <td>{{ count }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-center text-muted">暂无学期统计数据</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 成绩优秀学生 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">成绩优秀学生（平均分≥90）</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_students %}
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>学生姓名</th>
+                                    <th>学号</th>
+                                    <th>平均分</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in top_students %}
+                                    <tr>
+                                        <td>{{ student.name }}</td>
+                                        <td>{{ student.student_id }}</td>
+                                        <td>{{ student.average_score|round(2) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-center text-muted">暂无成绩优秀学生</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 难度较大课程 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">难度较大课程（平均分<70）</h5>
+                </div>
+                <div class="card-body">
+                    {% if challenging_courses %}
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>课程名称</th>
+                                    <th>课程代码</th>
+                                    <th>平均分</th>
+                                    <th>不及格率</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in challenging_courses %}
+                                    <tr>
+                                        <td>{{ course.course_name }}</td>
+                                        <td>{{ course.course_code }}</td>
+                                        <td>{{ course.average_score|round(2) }}</td>
+                                        <td>{{ course.fail_rate|round(2) }}%</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-center text-muted">暂无难度较大课程</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 成绩分布饼图
+            const ctx = document.getElementById('scoreDistributionChart').getContext('2d');
+            const scoreDistributionChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: [{% for range, count in score_distribution.items() %}"{{ range }}",{% endfor %}],
+                    datasets: [{
+                        data: [{% for range, count in score_distribution.items() %}{{ count }},{% endfor %}],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
